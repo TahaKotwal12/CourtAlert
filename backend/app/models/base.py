@@ -1,5 +1,5 @@
-from sqlalchemy.orm import DeclarativeBase, AsyncAttrs
+from sqlalchemy.orm import DeclarativeBase
 
 
-class Base(AsyncAttrs, DeclarativeBase):
+class Base(DeclarativeBase):
     pass

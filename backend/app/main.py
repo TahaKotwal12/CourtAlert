@@ -6,29 +6,56 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.exception import CourtAlertFatalException, CourtAlertNonFatalException
 from app.api.schemas.common_schemas import CommonResponse
 from app.config.logger import get_logger
+from app.core.config import settings
+
+# Routers
+from app.routers import auth, cases, notifications, webhooks, stats
 
 APP_TITLE = "CourtAlert API"
 
 app = FastAPI(title=APP_TITLE, version="1.0.0")
 
+# ---------------------------------------------------------------------------
+# CORS
+# ---------------------------------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ---------------------------------------------------------------------------
+# Routers
+# ---------------------------------------------------------------------------
+
+API_PREFIX = "/api/v1"
+
+app.include_router(auth.router,          prefix=API_PREFIX)
+app.include_router(cases.router,         prefix=API_PREFIX)
+app.include_router(notifications.router, prefix=API_PREFIX)
+app.include_router(webhooks.router,      prefix=API_PREFIX)
+app.include_router(stats.router,         prefix=API_PREFIX)
+
+# ---------------------------------------------------------------------------
+# Health / Root
+# ---------------------------------------------------------------------------
 
 @app.get("/")
 async def root():
-    return {"message": APP_TITLE, "status": "running"}
+    return {"message": APP_TITLE, "status": "running", "docs": "/docs"}
 
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": APP_TITLE}
 
+
+# ---------------------------------------------------------------------------
+# Exception handlers
+# ---------------------------------------------------------------------------
 
 @app.exception_handler(CourtAlertFatalException)
 async def fatal_exception_handler(request: Request, exc: CourtAlertFatalException):
