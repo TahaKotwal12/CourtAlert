@@ -17,9 +17,9 @@ from app.config.logger import get_logger
 
 logger = get_logger(__name__)
 
-# CNR format: 2-letter state + 2-letter district + 1-letter court + 7-digit number + 4-digit year
-# e.g. MHPN0101234562024
-CNR_REGEX = re.compile(r"^[A-Z]{4}\d{7}\d{4}$", re.IGNORECASE)
+# CNR format: 4-letter code (state+district) + 2-digit court + 6-digit case number + 4-digit year
+# e.g. DLHC010012342022  (total 16 chars: 4 letters + 12 digits)
+CNR_REGEX = re.compile(r"^[A-Z]{4}\d{12}$", re.IGNORECASE)
 
 # State code → court city mapping for realistic mock data
 STATE_COURTS = {

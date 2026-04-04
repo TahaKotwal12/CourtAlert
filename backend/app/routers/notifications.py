@@ -13,14 +13,35 @@ from app.models.notification import Notification
 from app.models.registration import Registration
 from app.models.user import User
 from app.schemas.notifications import (
+    GenerateMessageRequest,
+    GenerateMessageResponse,
     NotificationListItem,
     NotificationsListResponse,
     TestNotificationRequest,
     TestNotificationResponse,
 )
 from app.services import telegram_service
+from app.services.message_generator import build_message
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
+
+
+# ---------------------------------------------------------------------------
+# POST /notifications/run-alerts  (admin only — manual CRON trigger for demo)
+# ---------------------------------------------------------------------------
+
+@router.post("/run-alerts", status_code=status.HTTP_202_ACCEPTED)
+async def run_alerts_now(current_user: User = Depends(get_current_user)):
+    """
+    Manually trigger the daily alert job without waiting for the CRON schedule.
+    Useful for hackathon demos. Admin only.
+    """
+    if current_user.role != UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin only")
+
+    from app.workers.tasks import daily_alert_task
+    task = daily_alert_task.delay()
+    return {"message": "Alert job queued", "task_id": task.id}
 
 
 # ---------------------------------------------------------------------------
@@ -122,4 +143,39 @@ async def send_test_notification(
         status="sent",
         channel="telegram",
         message_id=message_id,
+    )
+
+
+# ---------------------------------------------------------------------------
+# POST /notifications/generate-message
+# ---------------------------------------------------------------------------
+
+@router.post("/generate-message", response_model=GenerateMessageResponse)
+async def generate_message(
+    payload:      GenerateMessageRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Generate a hearing reminder message via Featherless.ai (DeepSeek-V3.2).
+    Falls back to templates if LLM is unavailable.
+    Useful for previewing messages before they're sent by the CRON job.
+    """
+    from app.core.config import settings as cfg
+
+    # Call before to detect whether LLM will be used
+    llm_available = bool(cfg.FEATHERLESS_API_KEY)
+
+    message = await build_message(
+        case_title=payload.case_title,
+        hearing_date=payload.hearing_date,
+        court_name=payload.court_name,
+        court_room=payload.court_room,
+        language=payload.language,
+        days_before=payload.days_before,
+    )
+
+    return GenerateMessageResponse(
+        message=message,
+        language=payload.language,
+        source="llm" if llm_available else "template",
     )

@@ -16,6 +16,21 @@ class TestNotificationRequest(BaseModel):
     language:     str  = Field(default="hi")
 
 
+class GenerateMessageRequest(BaseModel):
+    case_title:   str  = Field(examples=["Sharma vs State of Maharashtra"])
+    hearing_date: date = Field(examples=["2026-04-11"])
+    court_name:   str  = Field(examples=["Bombay High Court"])
+    court_room:   str  = Field(default="—", examples=["Court Room 3"])
+    language:     str  = Field(default="hi", examples=["hi"])
+    days_before:  int  = Field(default=7, examples=[7])
+
+
+class GenerateMessageResponse(BaseModel):
+    message:  str
+    language: str
+    source:   str  # "llm" or "template"
+
+
 # ---------------------------------------------------------------------------
 # Response
 # ---------------------------------------------------------------------------

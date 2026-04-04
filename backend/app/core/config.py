@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: str = ""
     TELEGRAM_TEST_CHAT_ID: str = ""
 
+    # Redis / Celery
+    REDIS_URL: str = "redis://localhost:6379/0"
+
     # App
     APP_ENV: str = "development"
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"

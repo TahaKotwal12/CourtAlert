@@ -68,7 +68,8 @@ def future(days: int) -> date:
     return today + timedelta(days=days)
 
 def dt_past(days: int) -> datetime:
-    return datetime.now(timezone.utc) - timedelta(days=days)
+    # Naive UTC datetime — matches TIMESTAMP WITHOUT TIME ZONE columns in DB
+    return datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
 
 
 # ---------------------------------------------------------------------------
@@ -144,7 +145,7 @@ async def seed_registrations(db: AsyncSession, users: dict) -> dict:
     regs = {
         "r1": Registration(
             cnr_number="MHPN0101234562024",
-            phone_number="+919876543210",
+            phone_number="+917219742962",
             language="hi",
             case_title="Ramesh Patil vs State of Maharashtra",
             court_name="District Court, Pune",
@@ -155,7 +156,7 @@ async def seed_registrations(db: AsyncSession, users: dict) -> dict:
         ),
         "r2": Registration(
             cnr_number="MHPN0209876542025",
-            phone_number="+919876543211",
+            phone_number="+917219342962",
             language="mr",
             case_title="Sunita Sharma vs Pune Municipal Corporation",
             court_name="District Court, Pune",
@@ -166,7 +167,7 @@ async def seed_registrations(db: AsyncSession, users: dict) -> dict:
         ),
         "r3": Registration(
             cnr_number="DLCC0312345672024",
-            phone_number="+918765432109",
+            phone_number="+917219342962",
             language="hi",
             case_title="Amit Kumar vs Union of India",
             court_name="Delhi High Court",
@@ -177,7 +178,7 @@ async def seed_registrations(db: AsyncSession, users: dict) -> dict:
         ),
         "r4": Registration(
             cnr_number="KABL0456789012025",
-            phone_number="+917654321098",
+            phone_number="+917219342962",
             language="kn",
             case_title="Kavitha Reddy vs Revenue Authority",
             court_name="City Civil Court, Bengaluru",
@@ -401,7 +402,7 @@ async def seed_whatsapp_commands(db: AsyncSession, regs: dict):
     print("  → Seeding whatsapp_commands...")
     commands = [
         WhatsappCommand(
-            from_number="+919876543210",
+            from_number="+917219342962",
             body="REG MHPN0101234562024 HI",
             command_type=CommandType.REG,
             cnr_extracted="MHPN0101234562024",
@@ -412,7 +413,7 @@ async def seed_whatsapp_commands(db: AsyncSession, regs: dict):
             received_at=dt_past(30),
         ),
         WhatsappCommand(
-            from_number="+919876543211",
+            from_number="+917219342962",
             body="REG MHPN0209876542025 MR",
             command_type=CommandType.REG,
             cnr_extracted="MHPN0209876542025",
@@ -423,7 +424,7 @@ async def seed_whatsapp_commands(db: AsyncSession, regs: dict):
             received_at=dt_past(20),
         ),
         WhatsappCommand(
-            from_number="+919876543210",
+            from_number="+917219342962",
             body="STATUS",
             command_type=CommandType.STATUS,
             cnr_extracted=None,
