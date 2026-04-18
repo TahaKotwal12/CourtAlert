@@ -1,12 +1,10 @@
 # CourtAlert — Application Flow & Architecture
 
-> **ImpactHacks 2026** | Legal notification system for unrepresented litigants in India
-
 ---
 
 ## What It Does
 
-CourtAlert sends automated WhatsApp/SMS reminders to poor and unrepresented litigants in India so they never miss a court hearing. NGO workers register cases on behalf of litigants; the system polls eCourts India for hearing dates and sends multilingual alerts 7, 3, and 1 day before each hearing.
+CourtAlert sends automated WhatsApp/SMS reminders to unrepresented litigants in India so they never miss a court hearing. NGO workers register cases on behalf of litigants; the system polls eCourts India for hearing dates and sends multilingual alerts 7, 3, and 1 day before each hearing.
 
 ---
 
@@ -236,9 +234,9 @@ courts
 | Auth | JWT (python-jose) + bcrypt (passlib) |
 | Task Queue | Celery 5.4 + Redis |
 | Messaging (prod) | Twilio SMS/WhatsApp |
-| Messaging (demo) | Telegram Bot API |
+| Messaging (fallback) | Telegram Bot API |
 | AI Message Gen | Featherless.ai → DeepSeek-V3.2 |
-| eCourts API | Mocked (real API requires govt approval) |
+| eCourts API | Mocked (pending govt API approval) |
 | Frontend | React 19 + TypeScript + Tailwind CSS |
 
 ---
@@ -300,4 +298,4 @@ Output (Hindi):
 
 ---
 
-*Built for ImpactHacks 2026 — making the Indian justice system accessible to those who need it most.*
+*CourtAlert — making the Indian justice system accessible to those who need it most.*
